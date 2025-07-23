@@ -114,7 +114,7 @@ def draw_planet(surface,color,ship_direction,ship_pos,planet_pos,planet_rad):
 
     theta: The angle between these two lines/chopsticks.
 
-    
+    rad_on_screen: The radius of the circle that will be drawn on the screen, in pixels.
     """
 
     x_base = (WIDTH * (((0.5 * FOV) + ship_direction - relative_angle) / FOV))
@@ -122,7 +122,23 @@ def draw_planet(surface,color,ship_direction,ship_pos,planet_pos,planet_rad):
     d = math.sqrt(ship_camera_angle[0] ** 2 + ship_camera_angle[1] ** 2)
     slopes = tangent_slopes_to_circle(ship_pos[0],ship_pos[1],planet_pos[0],planet_pos[1],planet_rad)
     theta = degrees_between_slopes(slopes[0],slopes[1])
-    rad_on_screen = WIDTH * theta / (2 * FOV) + 1  
+    rad_on_screen = WIDTH * theta / (2 * FOV)
+
+    """
+    The below procedure ensures that the planet doesn't suddenly dissapear when it is on
+    the left edge on the screen, while still ensuring that it is drawn efficiently.
+
+    The first if statement checks if the planet is on the far left of the screen, to the point
+    it has an x value that is below 0, even though the right side of the planet is still visible
+    on the screen.
+
+    If this isn't the case, it will print the planet normally.
+
+    Additionally, the " % (360 * WIDTH / FOV) " portion of the formulas represents the ability
+    for the graph to print the planets position as the remainder of the total screen width beyond
+    what is visible. This ensures that when the user makes any number of turns, the planet will continue
+    reappearing.
+    """
 
     if (x_base % (360 * WIDTH / FOV)) > ((360 * WIDTH / FOV) - rad_on_screen):
         x = (x_base % (360 * WIDTH / FOV)) - (360 * WIDTH / FOV)
@@ -182,19 +198,18 @@ RED = (255, 0, 0)
 BROWN = (150, 75, 0)
 YELLOW = (255, 255, 0)
 
-BRIGHT_YELLOW = (255, 255, 100)
-DARK_RED = (139, 0, 0)
-ORANGE = (255, 165, 0)
-SKY_BLUE = (130, 200, 229)
-IRON_RED = (116, 65, 62)
-JUPITER_BROWN = (172, 133, 133)
-APRICOT = (237, 219, 173)
-PALE_BLUE = (122, 201, 206)
-PURPLE_COBALT = (63, 84, 186)
-DARK_MINT = (102, 87, 78)
+BRIGHT_YELLOW = (255, 255, 100) # Sun
+DARK_RED = (139, 0, 0) # Mercury
+ORANGE = (255, 165, 0) # Venus
+SKY_BLUE = (130, 200, 229) # Earth
+IRON_RED = (116, 65, 62) # Mars
+JUPITER_BROWN = (172, 133, 133) # Jupiter
+APRICOT = (237, 219, 173) # Saturn
+PALE_BLUE = (122, 201, 206) # Uranus
+PURPLE_COBALT = (63, 84, 186) # Neptune
+DARK_MINT = (102, 87, 78) # Pluto
 
 # Spaceship ui positions
-
 ship_pos = pygame.Vector2(WIDTH // 2, HEIGHT // 2 + 65)
 
 # Spaceship properties
@@ -231,8 +246,8 @@ arrow_head_width = 10
 arrow_color = RED
 
 # Planet Data
+# planet_list = [["Planet 1","Radius (m)","Starting position (x, y) (m)","Mass (kg)","Color (RGB)","Orbital Period (s)"],...]
 
-# planet_list = [["Planet 1","Radius (m)","Starting position (x, y) (m)","Mass (kg)","Color (RGB)","Orbital Period (s)"],["Planet 2","Radius","Starting position","Mass","Color"]]
 planet_list = [["Sun", 6.96 * (10 ** 8), pygame.Vector2(0, 0), 1.99 * (10 ** 30), BRIGHT_YELLOW,100], 
                ["Mercury", 1.74 * (10 ** 6), pygame.Vector2(0, 5.79 * (10 * 10)), 3.30 * (10 ** 23), DARK_RED],
                ["Venus", 6.05 * (10 ** 6), pygame.Vector2(0, 1.08 * (10 ** 11)), 4.87 * (10 ** 24), ORANGE],
@@ -243,10 +258,6 @@ planet_list = [["Sun", 6.96 * (10 ** 8), pygame.Vector2(0, 0), 1.99 * (10 ** 30)
                ["Uranus", 2.54 * (10 ** 7), pygame.Vector2(0,2.87 * (10 ** 12)), 8.68 * (10 ** 25), PALE_BLUE],
                ["Neptune", 2.48 * (10 ** 7), pygame.Vector2(0,4.50 * (10 ** 12)), 1.02 * (10 ** 26), PURPLE_COBALT],
                ["Pluto", 1.19 * (10 ** 6), pygame.Vector2(0,5.91 * (10 ** 12)), 1.19 * (10 ** 22), DARK_MINT]]
-
-sun_radius = 432690
-sun_pos = pygame.Vector2(0,4435000)
-sun_color = YELLOW
 
 # Arrow
 arrowImage = pygame.image.load("C:/Users/crawf/Documents/PythonProjects/spacegame/assets/red_arrow.png")
@@ -364,11 +375,6 @@ while running:
 
 
     # Drawing
-
-    # Draw Planets
-    # draw_planet(screen,YELLOW, 90-ship_angle,grid_pos,sun_pos,sun_radius)
-    # draw_planet(screen, planet_list[0][4], 90 - ship_angle, grid_pos, planet_list[0][2], planet_list[0][1])
-
     for x in planet_list:
         draw_planet(screen, x[4], 90 - ship_angle, grid_pos, x[2], x[1])
 
