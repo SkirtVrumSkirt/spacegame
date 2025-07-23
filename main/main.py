@@ -249,13 +249,13 @@ sun_pos = pygame.Vector2(0,4435000)
 sun_color = YELLOW
 
 # Arrow
-arrowImage = pygame.image.load("C:/Users/crawf/Documents/PythonProjects/spacegame/red_arrow.png")
+arrowImage = pygame.image.load("C:/Users/crawf/Documents/PythonProjects/spacegame/assets/red_arrow.png")
 resizedArrowImage = pygame.transform.scale(arrowImage,(50,50))
 def draw_arrow(position,angle):
     screen.blit(resizedArrowImage, position)
 
 # Cockpit
-cockpit = pygame.image.load("C:/Users/crawf/Documents/PythonProjects/spacegame/cockpit.002.png")
+cockpit = pygame.image.load("C:/Users/crawf/Documents/PythonProjects/spacegame/assets/cockpit.002.png")
 resizedCockpit = pygame.transform.scale(cockpit,(960,540))
 def draw_cockpit(position):
     screen.blit(resizedCockpit,position)
