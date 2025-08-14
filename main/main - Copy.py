@@ -212,12 +212,15 @@ def draw_planet(surface,planet_name,color,ship_direction,ship_pos,planet_pos,pla
     distance_surface = my_font.render(d_sci_not, False, WHITE)
     screen.blit(distance_surface, ((x_2 + 5), (y_2 + 5)))
 
-"""
 
-def gravitational_acceleration(planet_mass, s_pos, p_pos):
 
-    d_vector = p_pos - s_pos
+def gravitational_acceleration(planet_mass, planet_rad, planet_pos, ship_pos):
+
+    d_vector = planet_pos - ship_pos
     total_d = math.sqrt(d_vector[0] ** 2 + d_vector[1] ** 2)
+
+    if total_d < planet_rad:
+        total_d = planet_rad
 
     acceleration_x = math.copysign(1, d_vector[0]) * abs(gravitational_constant * planet_mass * d_vector[0] / (total_d ** 3))
     acceleration_y = math.copysign(1, d_vector[1]) * abs(gravitational_constant * planet_mass * d_vector[1] / (total_d ** 3))
@@ -225,7 +228,8 @@ def gravitational_acceleration(planet_mass, s_pos, p_pos):
     accel_vector = pygame.Vector2(acceleration_x, acceleration_y)
 
     return accel_vector
-"""
+
+
 
 # Draws the arrow on the ship interface indicating ship direction
 def draw_ship(surface, position, angle):
@@ -262,8 +266,8 @@ FPS = 60
 ship_pos = pygame.Vector2(WIDTH // 2, HEIGHT // 2 + 65)
 
 # Spaceship properties
-ship_vel = pygame.Vector2(0, 0)
-grid_pos = pygame.Vector2(0, 10 ** 9)
+ship_vel = pygame.Vector2(30000, 0)
+grid_pos = pygame.Vector2(0, 1.50 * (10 ** 11))
 ship_angle = 0
 thrust = 10
 rotation_speed = 0.0
@@ -295,7 +299,15 @@ arrow_head_width = 10
 arrow_color = RED
 
 # Planet Data
+
 # planet_list = [["Planet 1","Radius (m)","Starting position (x, y) (m)","Mass (kg)","Color (RGB)","Orbital Period (s)"],...]
+# planet_list[0] = Name
+# planet_list[1] = Radius (m)
+# planet_list[2] = Starting Position (x, y) (m)
+# planet_list[3] = Mass (kg)
+# planet_list[4] = Color (R,G,B)
+# planet_list[5] = Orbital Period (s)
+
 
 planet_list = [["Sun", 6.96 * (10 ** 8), pygame.Vector2(0, 0), 1.99 * (10 ** 30), BRIGHT_YELLOW,100], 
                ["Mercury", 1.74 * (10 ** 6), pygame.Vector2(0, 5.79 * (10 ** 10)), 3.30 * (10 ** 23), DARK_RED],
@@ -347,7 +359,7 @@ while running:
     text_surface = my_font.render(str((90-ship_angle) % 360), False, WHITE)
     shipSpeed_surface = my_font.render(str(round(shipSpeed,2)),False,WHITE)
     gridPos_surface = my_font.render(str(round(grid_pos,2)), False, WHITE)
-    shipVelocity_surface = my_font.render(str(round(ship_vel,2)),False,WHITE)
+    shipVelocity_surface = my_font.render(str(ship_vel),False,WHITE)
     shipDirection_surface = my_font.render(str(round(shipDirection,2)),False,WHITE)
     FPS_surface = my_font.render(str(FPS),False,WHITE)
     time_surface = my_font.render(str(time_multiplier),False,WHITE)
@@ -420,10 +432,10 @@ while running:
     angle_rad = math.radians(ship_angle)
 
     thrust_force = pygame.Vector2(math.sin(angle_rad), math.cos(angle_rad)) * thrust_pos * thrust * time_multiplier
-    # gravitational_force = gravitational_acceleration(planet_list[0][3], planet_list[0][2], grid_pos)
+    gravitational_force = gravitational_acceleration(planet_list[0][3], planet_list[0][1], planet_list[0][2], grid_pos)
 
-    # total_force = thrust_force + gravitational_force
-    total_force = thrust_force
+    total_force = thrust_force + gravitational_force
+    # total_force = thrust_force
 
     ship_vel += (total_force / FPS)
 
