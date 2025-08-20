@@ -258,6 +258,9 @@ def draw_thrust(surface,x,y,range,thrust,in_color,out_color):
     pygame.draw.rect(surface,in_color,rectangle,border_radius=bevel)
     pygame.draw.rect(surface,out_color,rectangle,border_radius=bevel,width=thickness)
 
+def satellite_velocity(mass, distance):
+    return math.sqrt(gravitational_constant * mass / distance)
+
 # General settings
 
 FPS = 60
@@ -266,7 +269,7 @@ FPS = 60
 ship_pos = pygame.Vector2(WIDTH // 2, HEIGHT // 2 + 65)
 
 # Spaceship properties
-ship_vel = pygame.Vector2(30000, 0)
+ship_vel = pygame.Vector2(10000, 0)
 grid_pos = pygame.Vector2(0, 1.50 * (10 ** 11))
 ship_angle = 0
 thrust = 10
@@ -306,19 +309,19 @@ arrow_color = RED
 # planet_list[2] = Starting Position (x, y) (m)
 # planet_list[3] = Mass (kg)
 # planet_list[4] = Color (R,G,B)
-# planet_list[5] = Orbital Period (s)
+# planet_list[5] = Velocity (x, y)
 
 
-planet_list = [["Sun", 6.96 * (10 ** 8), pygame.Vector2(0, 0), 1.99 * (10 ** 30), BRIGHT_YELLOW,100], 
-               ["Mercury", 1.74 * (10 ** 6), pygame.Vector2(0, 5.79 * (10 ** 10)), 3.30 * (10 ** 23), DARK_RED],
-               ["Venus", 6.05 * (10 ** 6), pygame.Vector2(0, 1.08 * (10 ** 11)), 4.87 * (10 ** 24), ORANGE],
-               ["Earth", 6.37 * (10 ** 6), pygame.Vector2(0, 1.50 * (10 ** 11)), 5.97 * (10 ** 24), SKY_BLUE],
-               ["Mars", 3.39 * (10 ** 6), pygame.Vector2(0, 2.28 * (10 ** 11)), 6.42 * (10 ** 23), IRON_RED],
-               ["Jupiter", 6.99 * (10 ** 7), pygame.Vector2(0,7.78 * (10 ** 11)), 1.90 * (10 ** 27), JUPITER_BROWN],
-               ["Saturn", 5.82 * (10 ** 7), pygame.Vector2(0,1.43 * (10 ** 12)), 5.68 * (10 ** 26), APRICOT],
-               ["Uranus", 2.54 * (10 ** 7), pygame.Vector2(0,2.87 * (10 ** 12)), 8.68 * (10 ** 25), PALE_BLUE],
-               ["Neptune", 2.48 * (10 ** 7), pygame.Vector2(0,4.50 * (10 ** 12)), 1.02 * (10 ** 26), PURPLE_COBALT],
-               ["Pluto", 1.19 * (10 ** 6), pygame.Vector2(0,5.91 * (10 ** 12)), 1.19 * (10 ** 22), DARK_MINT]]
+planet_list = [["Sun", 6.96 * (10 ** 8), pygame.Vector2(0, 0), 1.99 * (10 ** 30), BRIGHT_YELLOW, pygame.Vector2(satellite_velocity(0, 1), 0)], 
+               ["Mercury", 1.74 * (10 ** 6), pygame.Vector2(0, 5.79 * (10 ** 10)), 3.30 * (10 ** 23), DARK_RED, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 5.79 * (10 ** 10)), 0)],
+               ["Venus", 6.05 * (10 ** 6), pygame.Vector2(0, 1.08 * (10 ** 11)), 4.87 * (10 ** 24), ORANGE, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 1.08 * (10 ** 11)), 0)],
+               ["Earth", 6.37 * (10 ** 6), pygame.Vector2(0, 1.50 * (10 ** 11)), 5.97 * (10 ** 24), SKY_BLUE, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 1.50 * (10 ** 11)), 0)],
+               ["Mars", 3.39 * (10 ** 6), pygame.Vector2(0, 2.28 * (10 ** 11)), 6.42 * (10 ** 23), IRON_RED, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 2.28 * (10 ** 11)), 0)],
+               ["Jupiter", 6.99 * (10 ** 7), pygame.Vector2(0, 7.78 * (10 ** 11)), 1.90 * (10 ** 27), JUPITER_BROWN, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 7.78 * (10 ** 11)), 0)],
+               ["Saturn", 5.82 * (10 ** 7), pygame.Vector2(0, 1.43 * (10 ** 12)), 5.68 * (10 ** 26), APRICOT, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 1.43 * (10 ** 12)), 0)],
+               ["Uranus", 2.54 * (10 ** 7), pygame.Vector2(0, 2.87 * (10 ** 12)), 8.68 * (10 ** 25), PALE_BLUE, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 2.87 * (10 ** 12)), 0)],
+               ["Neptune", 2.48 * (10 ** 7), pygame.Vector2(0, 4.50 * (10 ** 12)), 1.02 * (10 ** 26), PURPLE_COBALT, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 4.50 * (10 ** 12)), 0)],
+               ["Pluto", 1.19 * (10 ** 6), pygame.Vector2(0, 5.91 * (10 ** 12)), 1.19 * (10 ** 22), DARK_MINT, pygame.Vector2(satellite_velocity(1.99 * (10 ** 30), 5.91 * (10 ** 12)), 0)]]
 
 # Arrow
 arrowImage = pygame.image.load("C:/Users/crawf/Documents/PythonProjects/spacegame/assets/red_arrow.png")
@@ -432,7 +435,7 @@ while running:
     angle_rad = math.radians(ship_angle)
 
     thrust_force = pygame.Vector2(math.sin(angle_rad), math.cos(angle_rad)) * thrust_pos * thrust * time_multiplier
-    gravitational_force = gravitational_acceleration(planet_list[0][3], planet_list[0][1], planet_list[0][2], grid_pos)
+    gravitational_force = gravitational_acceleration(planet_list[0][3], planet_list[0][1], planet_list[0][2], grid_pos) * time_multiplier
 
     total_force = thrust_force + gravitational_force
     # total_force = thrust_force
@@ -445,8 +448,17 @@ while running:
 
 
     # Drawing
+
     for x in planet_list:
         draw_planet(screen, x[0], x[4], 90 - ship_angle, grid_pos, x[2], x[1])
+
+    for x in range(len(planet_list) - 1):
+        
+        planet_gravitational_acceleration = gravitational_acceleration(planet_list[0][3], planet_list[0][1], planet_list[0][2], planet_list[x + 1][2])
+        planet_list[x + 1][5] += planet_gravitational_acceleration * time_multiplier / FPS
+        planet_list[x + 1][2] += planet_list[x + 1][5] * time_multiplier / FPS
+
+        # draw_planet(screen, x[0], x[4], 90 - ship_angle, grid_pos, x[2], x[1])
 
     # Draw cockpit
     # draw_cockpit((0,0))
